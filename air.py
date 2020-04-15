@@ -3,8 +3,7 @@ import scrapy
 from scrapy.selector import Selector
 from scrapy_selenium import SeleniumRequest
 from selenium.webdriver.common.keys import Keys
- #start_urls = ['http://www.airbnb.ca/s/mississauga/homes?refinement_paths%5B%5D=%2Fhomes']
-
+ 
 
 ###INPUT THE LOCATION YOU WANT WITH STAYS AT THE END######################
 n= 1
@@ -13,14 +12,14 @@ class AirSpider(scrapy.Spider):
     name = 'air'
     #allowed_domains = ['www.airbnb.ca']
     
-    
+    #get the webpage
     def start_requests(self):
         global city
         yield SeleniumRequest(url = "https://www.airbnb.ca/s/"+city+"/homes?refinement_paths%5B%5D=%2Ffor_you&search_type=search_query",
                               wait_time = 1, 
                               callback = self.parse)
 
-    
+   #send the name of the city you inputted into the search box on the website 
     def parse(self, response):
         global n
         global city
@@ -42,7 +41,7 @@ class AirSpider(scrapy.Spider):
         i=2
         ii = str(i)
         
-              
+        #loop through all the listings collecting data     
         for houses in house:
             name = houses.xpath(".//a/@aria-label").get()
             link = houses.xpath(".//a/@href").get()
@@ -68,7 +67,7 @@ class AirSpider(scrapy.Spider):
         nn = str(n)
         print(n)
         
-        
+        #if at end of page will go to the next available page
         next_page = response.xpath("(//nav/ul/li)["+nn+"]/a/@href").get()
         if next_page:
             yield SeleniumRequest(url = 'https://www.airbnb.ca'+next_page, callback = self.parse, wait_time =3)
